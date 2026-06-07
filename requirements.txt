@@ -15,7 +15,8 @@ pdfplumber
 sentence-transformers
 
 # Vector database
-faiss-cpu
+chromadb
+langchain-chroma
 
 # LLM via Groq API
 groq

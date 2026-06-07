@@ -8,7 +8,7 @@ Flow:
   Query → retriever → prompt → generator → streamed response (every query)
 
 Two modes:
-  1. build()  → run once to process PDF and build FAISS index
+  1. build()  → run once to process PDF and build ChromaDB collection
   2. query()  → run every time a user asks a question (streaming)
 """
 
@@ -49,7 +49,7 @@ _llm        = None
 def build_pipeline():
     """
     Full pipeline build:
-    Load PDF → Clean → Chunk → Embed → Save to FAISS
+    Load PDF → Clean → Chunk → Embed → Save to ChromaDB
 
     Run this ONCE to set up the vector database.
     After this, use query_pipeline() for all user queries.
@@ -71,10 +71,10 @@ def build_pipeline():
     # 4. Load embedding model
     embeddings = load_embedding_model()
 
-    # 5. Create & save FAISS vector store
+    # 5. Create & persist ChromaDB vector store
     vectordb = create_vectordb(chunks, embeddings, VECTORDB_PATH)
 
-    print("\n[Pipeline] Build complete! FAISS index ready.")
+    print("\n[Pipeline] Build complete! ChromaDB collection ready.")
     print(f"[Pipeline] Indexed {len(chunks)} chunks from document.")
     print("="*55 + "\n")
     return vectordb
@@ -84,7 +84,7 @@ def build_pipeline():
 
 def load_pipeline():
     """
-    Load the pre-built FAISS index + embedding model + LLM.
+    Load the pre-built ChromaDB collection + embedding model + LLM.
     Call this at app startup (in app.py via Streamlit session state).
 
     Returns:
@@ -101,13 +101,13 @@ def load_pipeline():
     # Load embedding model
     _embeddings = load_embedding_model()
 
-    # Load FAISS index from disk
+    # Load ChromaDB collection from disk
     _vectordb = load_vectordb(VECTORDB_PATH, _embeddings)
 
     # Create retriever (top 4 chunks)
     _retriever = get_retriever(_vectordb, k=4)
 
-    # Load LLM (Mistral via Groq)
+    # Load LLM (LLaMA via Groq)
     _llm = load_llm()
 
     print("[Pipeline] All components loaded. Ready for queries.\n")
@@ -165,7 +165,7 @@ if __name__ == "__main__":
     import argparse
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("--build", action="store_true", help="Build the FAISS index from PDF")
+    parser.add_argument("--build", action="store_true", help="Build the ChromaDB collection from PDF")
     parser.add_argument("--query", type=str, help="Ask a question (non-streaming test)")
     args = parser.parse_args()
 

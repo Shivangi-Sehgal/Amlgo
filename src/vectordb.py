@@ -2,68 +2,88 @@
 vectordb.py
 -----------
 Responsible for:
-1. Creating a FAISS vector store from document chunks + embeddings
-2. Saving the FAISS index to disk (/vectordb)
-3. Loading an existing FAISS index from disk
+1. Creating a ChromaDB vector store from document chunks + embeddings
+2. Persisting the Chroma collection to disk (/vectordb)
+3. Loading an existing Chroma collection from disk
 
-Why FAISS?
-- Runs fully locally (no server needed)
-- Fast similarity search even on CPU
-- Simple to save/load
+Why ChromaDB over FAISS?
+- Persistent by default (auto-saves to disk)
+- Built-in metadata filtering
+- No need for manual save/load calls
+- Easy to inspect stored collections
 - Officially supported by LangChain
 """
 
 import os
-from langchain_community.vectorstores import FAISS
+from langchain_chroma import Chroma
+
+# Fixed collection name for our eBay document
+COLLECTION_NAME = "ebay_user_agreement"
 
 
 def create_vectordb(chunks, embeddings, save_path: str):
     """
-    Create a FAISS vector store from chunks and save to disk.
+    Create a ChromaDB vector store from chunks and persist to disk.
 
     Args:
         chunks     : list of LangChain Document objects (from chunking.py)
         embeddings : embedding model (from embedding.py)
-        save_path  : directory path to save the FAISS index
+        save_path  : directory path to persist the Chroma collection
 
     Returns:
-        FAISS vector store object
+        Chroma vector store object
     """
-    print(f"[VectorDB] Creating FAISS index from {len(chunks)} chunks...")
-    vectordb = FAISS.from_documents(chunks, embeddings)
+    print(f"[VectorDB] Creating ChromaDB from {len(chunks)} chunks...")
+    print(f"[VectorDB] Persisting to: {save_path}")
 
     os.makedirs(save_path, exist_ok=True)
-    vectordb.save_local(save_path)
-    print(f"[VectorDB] FAISS index saved → {save_path}")
+
+    # Chroma automatically persists when persist_directory is set
+    vectordb = Chroma.from_documents(
+        documents=chunks,
+        embedding=embeddings,
+        collection_name=COLLECTION_NAME,
+        persist_directory=save_path,
+    )
+
+    count = vectordb._collection.count()
+    print(f"[VectorDB] ChromaDB created with {count} vectors.")
     return vectordb
 
 
 def load_vectordb(save_path: str, embeddings):
     """
-    Load an existing FAISS index from disk.
+    Load an existing ChromaDB collection from disk.
 
     Args:
-        save_path  : directory where FAISS index was saved
+        save_path  : directory where Chroma collection was persisted
         embeddings : same embedding model used during creation
 
     Returns:
-        FAISS vector store object ready for querying
+        Chroma vector store object ready for querying
     """
-    print(f"[VectorDB] Loading FAISS index from: {save_path}")
-    vectordb = FAISS.load_local(
-        save_path,
-        embeddings,
-        allow_dangerous_deserialization=True  # required by LangChain for local FAISS
+    print(f"[VectorDB] Loading ChromaDB from: {save_path}")
+
+    vectordb = Chroma(
+        collection_name=COLLECTION_NAME,
+        embedding_function=embeddings,
+        persist_directory=save_path,
     )
-    print(f"[VectorDB] FAISS index loaded successfully.")
+
+    count = vectordb._collection.count()
+    print(f"[VectorDB] ChromaDB loaded — {count} vectors ready.")
     return vectordb
 
 
 def get_chunk_count(save_path: str) -> int:
-    """Return number of vectors stored in the FAISS index."""
+    """
+    Return number of vectors stored in the ChromaDB collection.
+    Used by Streamlit sidebar to display indexed chunk count.
+    """
     try:
-        import faiss
-        index = faiss.read_index(os.path.join(save_path, "index.faiss"))
-        return index.ntotal
+        import chromadb
+        client = chromadb.PersistentClient(path=save_path)
+        collection = client.get_collection(COLLECTION_NAME)
+        return collection.count()
     except Exception:
         return -1

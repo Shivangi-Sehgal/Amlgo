@@ -15,9 +15,6 @@ Run with:
 """
 
 import os
-os.environ["STREAMLIT_SERVER_FILE_WATCHER_TYPE"] = "none"
-
-import os
 import sys
 import streamlit as st
 
@@ -97,7 +94,7 @@ with st.sidebar:
     st.markdown("`all-MiniLM-L6-v2`")
 
     st.markdown("**🗄️ Vector Store**")
-    st.markdown("`FAISS (local)`")
+    st.markdown("`ChromaDB (local)`")
 
     st.markdown("---")
 
@@ -147,7 +144,9 @@ st.markdown("<div class='sub-header'>Ask questions about the eBay User Agreement
 # ── Load pipeline on startup ──────────────────────────────────────────────────
 
 vectordb_path = os.path.join(os.path.dirname(__file__), "vectordb")
-vectordb_exists = os.path.exists(os.path.join(vectordb_path, "index.faiss"))
+vectordb_exists = os.path.exists(vectordb_path) and any(
+    f.endswith(".sqlite3") for f in os.listdir(vectordb_path)
+) if os.path.exists(vectordb_path) else False
 
 if not st.session_state.pipeline_loaded and vectordb_exists:
     with st.spinner("🔄 Loading RAG pipeline..."):
