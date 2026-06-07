@@ -1,0 +1,27 @@
+# RAG Chatbot - Requirements
+# Install with: pip install -r requirements.txt
+
+# LangChain core
+langchain
+langchain-community
+langchain-text-splitters
+langchain-groq
+
+# PDF loading
+pypdf
+pdfplumber
+
+# Embeddings (runs locally, no API key needed)
+sentence-transformers
+
+# Vector database
+faiss-cpu
+
+# LLM via Groq API
+groq
+
+# Streamlit UI
+streamlit
+
+# Environment variables
+python-dotenv
