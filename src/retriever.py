@@ -2,24 +2,24 @@
 retriever.py
 ------------
 Responsible for:
-Performing semantic search on the FAISS vector store
+Performing semantic search on the ChromaDB vector store
 to find the most relevant chunks for a user query.
 
 How it works:
 1. User query → embedding vector (same model used during indexing)
-2. FAISS finds top-k most similar chunk vectors
+2. ChromaDB finds top-k most similar chunk vectors
 3. Returns those chunks as source context for the LLM
 """
 
-from langchain_community.vectorstores import FAISS
+from langchain_chroma import Chroma
 
 
-def get_retriever(vectordb: FAISS, k: int = 4):
+def get_retriever(vectordb: Chroma, k: int = 4):
     """
-    Create a LangChain retriever from the FAISS vector store.
+    Create a LangChain retriever from the ChromaDB vector store.
 
     Args:
-        vectordb : loaded FAISS vector store
+        vectordb : loaded Chroma vector store
         k        : number of top relevant chunks to retrieve (default 4)
 
     Returns:
