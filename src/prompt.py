@@ -2,38 +2,72 @@
 prompt.py
 ---------
 Responsible for:
-Building the prompt template for Mistral-7B-Instruct.
-
-Mistral uses a specific chat format:
-[INST] ... [/INST]
+Building the prompt template for LLaMA 3.3 70B via Groq API.
 
 Our prompt injects:
-- Retrieved context chunks from FAISS
+- Retrieved context chunks from ChromaDB
 - The user's question
 - Instructions to stay grounded in the document
 """
 
 from langchain_core.prompts import PromptTemplate
 
-# Mistral-optimized RAG prompt template
-# {context} → retrieved chunks from FAISS
-# {question} → user's query
-RAG_PROMPT_TEMPLATE = """<s>[INST]
-You are a helpful assistant that answers questions strictly based on the provided document context.
 
-Instructions:
-- Answer ONLY using the information in the context below.
-- If the answer is not found in the context, say: "I could not find that information in the provided document."
-- Be concise, factual, and clear.
-- Do not make up or assume any information not present in the context.
+RAG_PROMPT_TEMPLATE = """
+You are an intelligent document question-answering assistant.
 
-Context from document:
+Your task is to answer the user's question ONLY using the information provided in the document context below.
+
+
+DOCUMENT CONTEXT
 {context}
 
-Question: {question}
-[/INST]
-"""
+USER QUESTION
+{question}
 
+INSTRUCTIONS
+
+1. Answer strictly from the provided document context.
+2. Do NOT use external knowledge.
+3. Do NOT make up facts, assumptions, or explanations.
+4. If the answer is not present in the context, reply exactly:
+   "Sorry, I do not know the answer."
+
+5. Keep answers:
+   - Clear
+   - Concise
+   - Factually accurate
+   - Well-structured
+
+6. When possible:
+   - Mention important clauses, conditions, or exceptions
+   - Preserve legal/business terminology from the document
+   - Summarize long sections into readable language
+
+7. If the question is ambiguous:
+   - Use the most relevant interpretation from the retrieved context
+   - Do not invent missing details
+
+8. If multiple chunks contain relevant information:
+   - Combine them into a single coherent answer
+   - Avoid repetition
+
+9. Never mention:
+   - embeddings
+   - vector databases
+   - retrieval systems
+   - chunking
+   - internal implementation details
+
+10. Do not say:
+   - "Based on the context provided..."
+   - "According to the retrieved chunks..."
+   - "The document says..."
+
+Return only the final answer.
+
+ANSWER:
+"""
 
 def get_prompt_template() -> PromptTemplate:
     """

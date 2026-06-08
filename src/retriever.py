@@ -6,7 +6,7 @@ Performing semantic search on the ChromaDB vector store
 to find the most relevant chunks for a user query.
 
 How it works:
-1. User query → embedding vector (same model used during indexing)
+1. User query - embedding vector (same model used during indexing)
 2. ChromaDB finds top-k most similar chunk vectors
 3. Returns those chunks as source context for the LLM
 """

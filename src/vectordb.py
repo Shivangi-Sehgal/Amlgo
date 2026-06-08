@@ -5,13 +5,6 @@ Responsible for:
 1. Creating a ChromaDB vector store from document chunks + embeddings
 2. Persisting the Chroma collection to disk (/vectordb)
 3. Loading an existing Chroma collection from disk
-
-Why ChromaDB over FAISS?
-- Persistent by default (auto-saves to disk)
-- Built-in metadata filtering
-- No need for manual save/load calls
-- Easy to inspect stored collections
-- Officially supported by LangChain
 """
 
 import os

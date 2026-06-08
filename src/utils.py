@@ -58,7 +58,7 @@ def print_chunk_stats(chunks_data: list):
     """Print summary stats about chunks."""
     wc = [c["word_count"] for c in chunks_data]
     sections = set(c["section"] for c in chunks_data)
-    print("\n── Chunk Statistics ─────────────────────────────")
+    print("\n Chunk Statistics ")
     print(f"  Total chunks    : {len(chunks_data)}")
     print(f"  Min words       : {min(wc)}")
     print(f"  Max words       : {max(wc)}")
@@ -66,7 +66,6 @@ def print_chunk_stats(chunks_data: list):
     print(f"  Sections found  : {len(sections)}")
     for s in sorted(sections):
         print(f"    → {s}")
-    print("─────────────────────────────────────────────────\n")
 
 
 def format_source_chunks(source_docs: list) -> str:

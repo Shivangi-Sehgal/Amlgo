@@ -4,12 +4,12 @@ pipeline.py
 Master RAG Pipeline — connects ALL modules together.
 
 Flow:
-  PDF → ingestion → chunking → embedding → vectordb (build once)
-  Query → retriever → prompt → generator → streamed response (every query)
+  PDF - ingestion, chunking, embedding, vectordb (build once)
+  Query - retriever , prompt , generator , streamed response (every query)
 
 Two modes:
-  1. build()  → run once to process PDF and build ChromaDB collection
-  2. query()  → run every time a user asks a question (streaming)
+  1. build()  - run once to process PDF and build ChromaDB collection
+  2. query()  - run every time a user asks a question (streaming)
 """
 
 import os
@@ -26,17 +26,17 @@ from retriever import get_retriever, retrieve_chunks, format_context
 from prompt import build_prompt
 from generator import load_llm, stream_response, generate_response
 from utils import save_chunks_to_json, print_chunk_stats
+import warnings
+warnings.filterwarnings("ignore")
 
-
-# ── Paths ─────────────────────────────────────────────────────────────────────
-
+# paths
 BASE_DIR    = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PDF_PATH    = os.path.join(BASE_DIR, "data", "AI Training Document.pdf")
 CHUNKS_PATH = os.path.join(BASE_DIR, "chunks", "chunks.json")
 VECTORDB_PATH = os.path.join(BASE_DIR, "vectordb")
 
 
-# ── Global state (loaded once, reused across queries) ─────────────────────────
+# Global state (loaded once, reused across queries) 
 
 _embeddings = None
 _vectordb   = None
@@ -44,7 +44,7 @@ _retriever  = None
 _llm        = None
 
 
-# ── Step 1: Build pipeline (run once) ─────────────────────────────────────────
+# Step 1: Build pipeline (run once) 
 
 def build_pipeline():
     """
@@ -80,12 +80,11 @@ def build_pipeline():
     return vectordb
 
 
-# ── Step 2: Load pipeline (after build) ───────────────────────────────────────
+# Step 2: Load pipeline (after build) 
 
 def load_pipeline():
     """
     Load the pre-built ChromaDB collection + embedding model + LLM.
-    Call this at app startup (in app.py via Streamlit session state).
 
     Returns:
         retriever, llm  → used by query_pipeline()
@@ -114,14 +113,14 @@ def load_pipeline():
     return _retriever, _llm
 
 
-# ── Step 3: Query pipeline (every user message) ───────────────────────────────
+#  Step 3: Query pipeline (every user message) 
 
 def query_pipeline(question: str, retriever, llm, stream: bool = True):
     """
     Run a full RAG query:
-    1. Retrieve relevant chunks from FAISS
+    1. Retrieve relevant chunks from ChromaDB
     2. Build prompt with context
-    3. Stream response from Mistral via Groq
+    3. Stream response from LLaMA via Groq
 
     Args:
         question  : user's natural language query
@@ -141,7 +140,7 @@ def query_pipeline(question: str, retriever, llm, stream: bool = True):
     # Step 2: Format context from retrieved chunks
     context = format_context(source_docs)
 
-    # Step 3: Build the Mistral prompt
+    # Step 3: Build the LLaMA prompt
     prompt = build_prompt(context=context, question=question)
 
     # Step 4: Generate response
@@ -152,14 +151,14 @@ def query_pipeline(question: str, retriever, llm, stream: bool = True):
         return response, source_docs
 
 
-# ── Utility: get chunk count for Streamlit sidebar ────────────────────────────
+#  Utility: get chunk count for Streamlit sidebar 
 
 def get_indexed_chunk_count() -> int:
-    """Return number of chunks in the FAISS index."""
+    """Return number of chunks in the ChromaDB collection."""
     return get_chunk_count(VECTORDB_PATH)
 
 
-# ── Run standalone (build pipeline from terminal) ─────────────────────────────
+#  Run standalone (build pipeline from terminal) 
 
 if __name__ == "__main__":
     import argparse
@@ -182,5 +181,5 @@ if __name__ == "__main__":
 
     else:
         print("Usage:")
-        print("  python pipeline.py --build          # build FAISS index")
+        print("  python pipeline.py --build          # build ChromaDB collection")
         print("  python pipeline.py --query 'text'   # test a query")

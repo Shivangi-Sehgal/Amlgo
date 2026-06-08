@@ -11,9 +11,6 @@ from langchain_community.embeddings import HuggingFaceEmbeddings
 
 def load_embedding_model(model_name: str = "all-MiniLM-L6-v2"):
     """
-    Load HuggingFace sentence-transformer embedding model.
-    Downloads automatically on first use (~90MB).
-
     Returns a LangChain-compatible embedding object
     that can be passed directly to chromadb.
     """
