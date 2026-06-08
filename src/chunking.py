@@ -18,8 +18,8 @@ def chunk_documents(documents):
     print("[Chunking] Splitting documents into chunks...")
 
     splitter = RecursiveCharacterTextSplitter(
-        chunk_size=1200,
-        chunk_overlap=200,
+        chunk_size=1800,
+        chunk_overlap=300,
         separators=["\n\n", "\n• ", "\n", ". ", " "],
         length_function=len,
     )

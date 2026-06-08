@@ -45,8 +45,7 @@ INSTRUCTIONS
    - Summarize long sections into readable language
 
 7. If the question is ambiguous:
-   - Use the most relevant interpretation from the retrieved context
-   - Do not invent missing details
+   - Ask for clarification instead of guessing
 
 8. If multiple chunks contain relevant information:
    - Combine them into a single coherent answer

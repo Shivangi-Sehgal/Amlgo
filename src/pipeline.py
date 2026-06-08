@@ -68,6 +68,7 @@ def build_pipeline():
     chunks_data = save_chunks_to_json(chunks, CHUNKS_PATH)
     print_chunk_stats(chunks_data)
 
+
     # 4. Load embedding model
     embeddings = load_embedding_model()
 

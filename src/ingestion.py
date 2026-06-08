@@ -51,9 +51,6 @@ def clean_text(text: str) -> str:
     text = re.sub(r'\bPage\s+\d+(\s+of\s+\d+)?\b', '', text)
     text = re.sub(r'^\s*\d+\s*$', '', text, flags=re.MULTILINE)
 
-    # Remove repeated document title header
-    text = re.sub(r'\bUser Agreement\b', '', text)
-
     # Normalize whitespace
     text = re.sub(r'[ \t]+', ' ', text)
     text = re.sub(r'\n{3,}', '\n\n', text)

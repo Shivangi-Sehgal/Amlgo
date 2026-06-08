@@ -100,8 +100,8 @@ The cleaned document is split into overlapping chunks using `RecursiveCharacterT
 
 ### Configuration
 
-* Chunk Size: `1200`
-* Chunk Overlap: `200`
+* Chunk Size: `1800`
+* Chunk Overlap: `300`
 
 This preserves semantic continuity and improves retrieval accuracy.
 
@@ -255,26 +255,6 @@ How are disputes handled?
 ```text
 What are the listing fees?
 ```
-
----
-
-# Limitations
-
-* Retrieval quality depends on chunk relevance
-* Full-document summarization may be incomplete
-* CPU embeddings increase indexing time
-* Context window limitations affect long responses
-
----
-
-# Future Improvements
-
-* Hybrid search (BM25 + vector search)
-* Metadata filtering
-* Source citations in responses
-* Multi-PDF support
-* Conversational memory
-* Re-ranking models for retrieval optimization
 
 ---
 
